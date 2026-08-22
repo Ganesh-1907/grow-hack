@@ -25,6 +25,7 @@ const profileModal = document.getElementById("profile-modal");
 const profileForm = document.getElementById("profile-form");
 const profileError = document.getElementById("profile-error");
 const greeting = document.getElementById("greeting");
+const editProfileBtn = document.getElementById("edit-profile-btn");
 const PROFILE_KEY = "ghai_profile";
 
 // --- Theme Switching Logic ---
@@ -74,6 +75,19 @@ function showGreeting(profile) {
   const first = (profile.name || "").trim().split(/\s+/)[0] || "friend";
   greeting.textContent = `Welcome back, ${first}!`;
   greeting.classList.remove("hidden");
+  if (editProfileBtn) editProfileBtn.classList.remove("hidden");
+}
+
+function openProfileModal(prefill) {
+  if (profileError) profileError.classList.add("hidden");
+  if (prefill) {
+    document.getElementById("profile-name").value = prefill.name || "";
+    document.getElementById("profile-email").value = prefill.email || "";
+  } else {
+    document.getElementById("profile-name").value = "";
+    document.getElementById("profile-email").value = "";
+  }
+  if (profileModal) profileModal.classList.remove("hidden");
 }
 
 (function initProfile() {
@@ -82,10 +96,12 @@ function showGreeting(profile) {
     showGreeting(profile);
     return;
   }
-  if (profileModal) {
-    profileModal.classList.remove("hidden");
-  }
+  openProfileModal(null);
 })();
+
+if (editProfileBtn) {
+  editProfileBtn.addEventListener("click", () => openProfileModal(getProfile()));
+}
 
 if (profileForm) {
   profileForm.addEventListener("submit", (event) => {
