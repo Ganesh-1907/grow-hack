@@ -112,6 +112,29 @@ function switchTab(activeTab) {
   if (tabSliderTrack) {
     tabSliderTrack.style.transform = showRepo ? "translateX(0%)" : "translateX(-50%)";
   }
+
+  if (showRepo) {
+    // Hide content creator results
+    if (contentResults) contentResults.classList.add("hidden");
+    
+    // Restore repository documentation results if they exist
+    if (preview && preview.innerHTML.trim() !== "") {
+      if (resultsSection) resultsSection.classList.remove("hidden");
+    }
+    if (summaryContent && summaryContent.innerHTML.trim() !== "") {
+      if (summaryCard) summaryCard.classList.remove("hidden");
+    }
+  } else {
+    // Hide repository documentation results & progress
+    if (resultsSection) resultsSection.classList.add("hidden");
+    if (summaryCard) summaryCard.classList.add("hidden");
+    if (progressSection) progressSection.classList.add("hidden");
+    
+    // Restore content creator results if they exist
+    if (contentPreview && contentPreview.innerHTML.trim() !== "") {
+      if (contentResults) contentResults.classList.remove("hidden");
+    }
+  }
 }
 
 if (tabRepo) {

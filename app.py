@@ -101,6 +101,14 @@ def generate_content():
         result["cover_author"] = author
     result["author_email"] = (payload.get("email") or "").strip()
 
+    content = result.get("content_markdown") or ""
+    if author and content:
+        signature = f"\n\n---\n\n*Written by {author}*"
+        if result["author_email"]:
+            signature += f" · {result['author_email']}"
+        content += signature
+        result["content_markdown"] = content
+
     title = (result.get("title") or "Generated Content").strip()
     safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", title)[:80] or "generated-content"
     markdown_path = config.content_dir / f"{safe_name}.md"

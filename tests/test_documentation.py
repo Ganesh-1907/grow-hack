@@ -65,7 +65,7 @@ def test_markdown_service_generates_sections(tmp_path: Path):
 def test_index_route(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"GitHub Repository Intelligence" in response.data
+    assert b"Full-Stack Content Creator" in response.data
 
 
 def test_analyze_missing_url(client):
