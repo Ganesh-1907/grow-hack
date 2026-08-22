@@ -87,6 +87,7 @@ def generate_content():
     """
     payload = request.get_json(silent=True) or {}
     input_text = payload.get("input", "").strip()
+    author = (payload.get("author") or "").strip()
 
     if not input_text:
         return jsonify({"error": "Content input is required."}), 400
@@ -95,6 +96,10 @@ def generate_content():
         result = content_agent.run(input_text)
     except Exception as exc:  # noqa: BLE001 - surface unexpected errors to UI
         return jsonify({"error": f"Content generation failed: {exc}"}), 500
+
+    if author:
+        result["cover_author"] = author
+    result["author_email"] = (payload.get("email") or "").strip()
 
     title = (result.get("title") or "Generated Content").strip()
     safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", title)[:80] or "generated-content"
