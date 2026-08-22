@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHub Repository Intelligence & Documentation Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <div class="max-w-6xl mx-auto px-4 py-10">
+    <header class="text-center mb-10">
+      <p class="text-sm uppercase tracking-widest text-sky-400 mb-2">Content Platform</p>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight">
+        Repo Intelligence & Content Creator
+      </h1>
+      <p class="text-slate-400 mt-3 max-w-2xl mx-auto">
+        Paste a repository URL to generate professional documentation, or give
+        any topic (or repo) to get publish-ready content written by AI.
+      </p>
+    </header>
+
+    <div class="max-w-3xl mx-auto mb-6 flex gap-2">
+      <button id="tab-repo" class="tab-btn active">Repository Docs</button>
+      <button id="tab-content" class="tab-btn">Content Creator</button>
+    </div>
+
+    <section id="repo-panel" class="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+      <form id="analyze-form" class="space-y-4">
+        <div>
+          <label for="repo-url" class="block text-sm font-medium text-slate-300 mb-2">
+            GitHub repository URL
+          </label>
+          <input
+            id="repo-url"
+            name="repo_url"
+            type="url"
+            required
+            placeholder="https://github.com/langchain-ai/langgraph"
+            class="w-full rounded-xl bg-slate-950 border border-slate-700 px-4 py-3 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+          >
+        </div>
+        <button
+          id="analyze-button"
+          type="submit"
+          class="w-full rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Analyze Repository
+        </button>
+      </form>
+      <p id="error-message" class="hidden mt-4 text-sm text-rose-400"></p>
+    </section>
+
+    <section id="content-panel" class="hidden max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+      <form id="content-form" class="space-y-4">
+        <div>
+          <label for="content-input" class="block text-sm font-medium text-slate-300 mb-2">
+            Topic or GitHub repository URL
+          </label>
+          <textarea
+            id="content-input"
+            name="input"
+            required
+            rows="4"
+            placeholder="e.g. How to build a REST API with Flask and DeepSeek, or https://github.com/user/repo"
+            class="w-full rounded-xl bg-slate-950 border border-slate-700 px-4 py-3 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+          ></textarea>
+          <p class="text-xs text-slate-500 mt-2">
+            Give it any topic, a GitHub repo URL, or even raw code/README text.
+            It classifies the input, researches, drafts, and self-reviews — fully unattended.
+          </p>
+        </div>
+        <button
+          id="content-button"
+          type="submit"
+          class="w-full rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Generate Content
+        </button>
+      </form>
+      <p id="content-error" class="hidden mt-4 text-sm text-rose-400"></p>
+      <p id="content-status" class="hidden mt-4 text-sm text-sky-400 animate-pulse"></p>
+    </section>
+
+    <section id="progress-section" class="hidden max-w-3xl mx-auto mt-8">
+      <ol id="progress-steps" class="grid gap-3 md:grid-cols-4">
+        <li class="step" data-step="1"><span class="step-dot"></span>Validate</li>
+        <li class="step" data-step="2"><span class="step-dot"></span>Fetch</li>
+        <li class="step" data-step="3"><span class="step-dot"></span>Analyze</li>
+        <li class="step" data-step="4"><span class="step-dot"></span>Generate</li>
+      </ol>
+    </section>
+
+    <section id="summary-card" class="hidden max-w-3xl mx-auto mt-8 bg-slate-900 border border-slate-800 rounded-2xl p-6">
+      <h2 class="text-lg font-semibold mb-3">Repository Summary</h2>
+      <div id="summary-content" class="grid gap-2 text-sm"></div>
+    </section>
+
+    <section id="content-results" class="hidden mt-10 max-w-3xl mx-auto">
+      <div id="content-live-banner" class="hidden mb-4 rounded-2xl border border-emerald-500 bg-emerald-500/10 p-4">
+        <p class="text-sm text-emerald-300 mb-2">Published live on Dev.to</p>
+        <a id="content-live-link" href="#" target="_blank" rel="noopener"
+           class="inline-block rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-5 py-3 transition">
+          View live post &rarr;
+        </a>
+      </div>
+      <p id="content-publish-error" class="hidden mb-4 text-sm text-amber-400 bg-slate-900 border border-amber-800 rounded-xl p-4"></p>
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <h2 id="content-title" class="text-2xl font-semibold"></h2>
+        <div class="flex flex-wrap gap-2">
+          <span id="content-type-badge" class="badge"></span>
+          <button id="download-content" class="btn-secondary" disabled>Download Markdown</button>
+        </div>
+      </div>
+      <div id="content-notes" class="mb-4 text-sm text-slate-400 bg-slate-900 border border-slate-800 rounded-xl p-4"></div>
+      <div class="bg-white text-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div id="content-preview" class="markdown-preview p-6 md:p-10"></div>
+      </div>
+    </section>
+
+    <section id="results-section" class="hidden mt-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <h2 class="text-2xl font-semibold">Generated Documentation</h2>
+        <div class="flex flex-wrap gap-3">
+          <button id="download-markdown" class="btn-secondary">Download Markdown</button>
+          <button id="download-pdf" class="btn-secondary" disabled>Download PDF</button>
+          <button class="btn-disabled" disabled title="Coming soon">Generate Blog</button>
+          <button class="btn-disabled" disabled title="Coming soon">Generate LinkedIn</button>
+          <button class="btn-disabled" disabled title="Coming soon">Generate X Thread</button>
+          <button class="btn-disabled" disabled title="Coming soon">Generate Tutorial</button>
+        </div>
+      </div>
+      <div class="bg-white text-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div id="markdown-preview" class="markdown-preview p-6 md:p-10"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

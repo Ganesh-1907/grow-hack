@@ -1,0 +1,11 @@
+flask>=3.0.0
+python-dotenv>=1.0.1
+loguru>=0.7.2
+pydantic>=2.7.0
+openai>=1.35.0
+langgraph>=0.2.0
+PyGithub>=2.3.0
+GitPython>=3.1.43
+markdown>=3.6
+weasyprint>=62.0
+pytest>=8.2.0

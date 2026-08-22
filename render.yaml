@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: github-doc-ai
+    runtime: docker
+    plan: standard
+    healthCheckPath: /
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: ENABLE_MOCK_LLM
+        value: false
+      - key: LLM_PROVIDER
+        value: deepseek
+      - key: LLM_MODEL
+        value: deepseek-chat
+      - key: LLM_BASE_URL
+        value: https://api.deepseek.com
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEVTO_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
